@@ -127,3 +127,15 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Repository specific
+datasets/*
+DPT/weights/*.pt
+wandb/*
+*.png
+*.jpg
+*.right
+DPT/util/__pycache__/*.pyc
+models/FocusOnDepth.p
+*.tar
+*.zip
