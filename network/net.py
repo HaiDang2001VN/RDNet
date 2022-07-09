@@ -106,7 +106,7 @@ class FocusOnDepth(nn.Module):
         return model.forward_head(x)
 
     def segmentation_distill(self, segmentations):
-        seg_patches = self.seg_patch_emb(segmentations.to(torch.int64))
+        seg_patches = self.seg_patch_emb(segmentations).to(torch.int64)
         oh_patches = nn.functional.one_hot(seg_patches, num_classes=self.num_classes)
         class_distribution = oh_patches.sum(dim=-2, keepdim=True) / (self.patch_size**2)
         weighted_embeddings = class_distribution.transpose(-1, -2) * self.class_embeddings
