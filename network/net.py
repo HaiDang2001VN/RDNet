@@ -63,6 +63,7 @@ class FocusOnDepth(nn.Module):
 
         self.class_embeddings = nn.Parameter(torch.randn(1, 1, nclasses, class_embedding_size))
         self.transformer_encoders = timm.create_model(model_timm, pretrained=True)
+        print(emb_dim + class_embedding_size, emb_dim)
         self.emb_to_vit = nn.Linear(emb_dim + class_embedding_size, emb_dim)
         self.seg_patch_emb = timm.models.layers.PatchEmbed(img_size=image_size[-1],
                                                            patch_size=patch_size,
@@ -134,6 +135,7 @@ class FocusOnDepth(nn.Module):
         patch_embeddings = self.segmentation_distill(segmentations=segmentations)
         patches = torch.cat((img_patches, patch_embeddings), dim=-1)
         # l*1024 -> l*768
+        print(patches.shape)
         vit_input = self.emb_to_vit(patches)
         t = self.transformer_forward(model, vit_input)
         
