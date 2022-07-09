@@ -10,7 +10,7 @@
     "resample_dim": 256,
     "optim": "adam",
     "lr_backbone": 1e-5,
-    "lr_scratch": 3e-4,
+    "lr_scratch": 1e-3,
     "loss_depth": "ssi",
     "loss_segmentation": "ce",
     "momentum": 0.9,
