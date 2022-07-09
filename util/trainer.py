@@ -26,7 +26,7 @@ class Trainer(object):
                     emb_dim     =   config['General']['emb_dim'],
                     resample_dim=   config['General']['resample_dim'],
                     read        =   config['General']['read'],
-                    # nclasses    =   len(config['Dataset']['classes']) + 1,
+                    nclasses    =   len(config['Dataset']['classes']),
                     hooks       =   config['General']['hooks'],
                     model_timm  =   config['General']['model_timm'],
                     type        =   self.type,
