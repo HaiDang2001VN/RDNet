@@ -19,14 +19,20 @@ autofocus_datasets_train = []
 for dataset_name in list_data:
     autofocus_datasets_train.append(AutoFocusDataset(config, dataset_name, 'train'))
 train_data = ConcatDataset(autofocus_datasets_train)
-train_dataloader = DataLoader(train_data, batch_size=config['General']['batch_size'], shuffle=True)
+train_dataloader = DataLoader(train_data, batch_size=config['General']['batch_size'],
+                              shuffle=True,
+                              pin_memory=True,
+                              num_workers=config['General']['num_workers'])
 
 ## validation set
 autofocus_datasets_val = []
 for dataset_name in list_data:
     autofocus_datasets_val.append(AutoFocusDataset(config, dataset_name, 'val'))
 val_data = ConcatDataset(autofocus_datasets_val)
-val_dataloader = DataLoader(val_data, batch_size=config['General']['batch_size'], shuffle=True)
+val_dataloader = DataLoader(val_data, batch_size=config['General']['batch_size'],
+                            shuffle=False,
+                            pin_memory=True,
+                            num_workers=config['General']['num_workers'])
 
 trainer = Trainer(config)
 trainer.train(train_dataloader, val_dataloader)
