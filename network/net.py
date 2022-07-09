@@ -66,10 +66,6 @@ class FocusOnDepth(nn.Module):
         self.transformer_encoders = timm.create_model(model_timm, pretrained=True)
         self.emb_to_vit = nn.Linear(emb_dim + class_embedding_size, emb_dim)
         self.seg_patch_emb = Rearrange('b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1=patch_size, p2=patch_size)
-        # self.seg_patch_emb = timm.models.layers.PatchEmbed(img_size=image_size[-1],
-        #                                                    patch_size=patch_size,
-        #                                                    in_chans=1,
-        #                                                    embed_dim=emb_dim)
 
         # Register hooks
         self.activation = {}
@@ -129,17 +125,12 @@ class FocusOnDepth(nn.Module):
         print("images: ", images.isnan().sum(), images.min().item(), images.max().item())
 
         model = self.transformer_encoders
-        # flatten image into patch then patch into vector
-        # img_patches size: b l=h*w/p^2 p^2*c
         img_patches = model.patch_embed(images)
         print("img_patches: ", img_patches.isnan().sum())
-        # TO DO: integrate segmentation result of the patch
-        # l*768 -> l*1024 
         patch_embeddings = self.segmentation_distill(segmentations=segmentations)
         print("patch_embeddings: ", patch_embeddings.isnan().sum())
         patches = torch.cat((img_patches, patch_embeddings), dim=-1)
         print("patches: ", patches.isnan().sum())
-        # l*1024 -> l*768
         vit_input = self.emb_to_vit(patches)
         t = self.transformer_forward(model, vit_input)
         print("vit_input: ", vit_input.isnan().sum())
@@ -157,13 +148,13 @@ class FocusOnDepth(nn.Module):
         print("prev: ", previous_stage.isnan().sum())
         
         out_depth = None
-        # out_segmentation = None
+        out_segmentation = None
         if self.head_depth != None:
             out_depth = self.head_depth(previous_stage)
         if self.head_segmentation != None:
             out_segmentation = self.head_segmentation(previous_stage)
-        # return out_depth, out_segmentation
-        return out_depth
+        return out_depth, out_segmentation
+        # return out_depth
 
     def _get_layers_from_hooks(self, hooks):
         def get_activation(name):
@@ -171,5 +162,4 @@ class FocusOnDepth(nn.Module):
                 self.activation[name] = output
             return hook
         for h in hooks:
-            # self.transformer_encoders.layers[h].register_forward_hook(get_activation('t'+str(h)))
             self.transformer_encoders.blocks[h].register_forward_hook(get_activation('t'+str(h)))
