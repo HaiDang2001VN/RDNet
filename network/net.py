@@ -122,21 +122,12 @@ class FocusOnDepth(nn.Module):
 
         # Feed pre-processed images to transformer
         # t = self.transformer_encoders(img)
-        print("images: ", images.isnan().sum(), images.min().item(), images.max().item())
-
         model = self.transformer_encoders
         img_patches = model.patch_embed(images)
-        print("img_patches: ", img_patches.isnan().sum())
         patch_embeddings = self.segmentation_distill(segmentations=segmentations)
-        print("patch_embeddings: ", patch_embeddings.isnan().sum())
         patches = torch.cat((img_patches, patch_embeddings), dim=-1)
-        print("patches: ", patches.isnan().sum())
         vit_input = self.emb_to_vit(patches)
         t = self.transformer_forward(model, vit_input)
-        print("vit_input: ", vit_input.isnan().sum())
-        print("t: ", t.isnan().sum())
-
-
 
         previous_stage = None
         for i in np.arange(len(self.fusions)-1, -1, -1):
