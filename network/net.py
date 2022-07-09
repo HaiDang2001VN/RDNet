@@ -149,12 +149,13 @@ class FocusOnDepth(nn.Module):
             fusion_result = self.fusions[i](reassemble_result, previous_stage)
             previous_stage = fusion_result
         out_depth = None
-        out_segmentation = None
+        # out_segmentation = None
         if self.head_depth != None:
             out_depth = self.head_depth(previous_stage)
         if self.head_segmentation != None:
             out_segmentation = self.head_segmentation(previous_stage)
-        return out_depth, out_segmentation
+        # return out_depth, out_segmentation
+        return out_depth
 
     def _get_layers_from_hooks(self, hooks):
         def get_activation(name):
