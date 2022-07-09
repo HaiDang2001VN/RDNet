@@ -15,9 +15,8 @@ class ToMask(object):
         # avoid taking the alpha channel
         image_array = np.array(pil_image)[:, :, :3]
         # get only one channel for the output
-        output_shape = list(image_array.shape[:-1])
-        output_array = np.zeros(image_array.shape, dtype="int")[:, :, 0]
-        print(output_shape, output_array.shape)
+        output_shape = image_array.shape[:-1]
+        output_array = np.zeros(output_shape, dtype="int")
 
         for label in self.palette_dictionnary.keys():
             rgb_color = self.palette_dictionnary[label]['color']
