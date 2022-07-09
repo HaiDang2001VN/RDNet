@@ -65,13 +65,15 @@ class Trainer(object):
                 self.optimizer_backbone.zero_grad()
                 self.optimizer_scratch.zero_grad()
                 # forward + backward + optimizer
-                output_depths, output_segmentations = self.model(X)
+                # output_depths, output_segmentations = self.model(X)
+                output_depths = self.model(X, Y_segmentations)
                 output_depths = output_depths.squeeze(1) if output_depths != None else None
 
                 Y_depths = Y_depths.squeeze(1) #1xHxW -> HxW
                 Y_segmentations = Y_segmentations.squeeze(1) #1xHxW -> HxW
                 # get loss
-                loss = self.loss_depth(output_depths, Y_depths) + self.loss_segmentation(output_segmentations, Y_segmentations)
+                # loss = self.loss_depth(output_depths, Y_depths) + self.loss_segmentation(output_segmentations, Y_segmentations)
+                loss = self.loss_depth(output_depths, Y_depths)
                 loss.backward()
                 # step optimizer
                 self.optimizer_scratch.step()
@@ -120,7 +122,8 @@ class Trainer(object):
             pbar.set_description("Validation")
             for i, (X, Y_depths, Y_segmentations) in enumerate(pbar):
                 X, Y_depths, Y_segmentations = X.to(self.device), Y_depths.to(self.device), Y_segmentations.to(self.device)
-                output_depths, output_segmentations = self.model(X)
+                # output_depths, output_segmentations = self.model(X)
+                output_depths = self.model(X, Y_segmentations) 
                 output_depths = output_depths.squeeze(1) if output_depths != None else None
                 Y_depths = Y_depths.squeeze(1)
                 Y_segmentations = Y_segmentations.squeeze(1)
@@ -129,9 +132,10 @@ class Trainer(object):
                     Y_depths_1 = Y_depths
                     Y_segmentations_1 = Y_segmentations
                     output_depths_1 = output_depths
-                    output_segmentations_1 = output_segmentations
+                    # output_segmentations_1 = output_segmentations
                 # get loss
-                loss = self.loss_depth(output_depths, Y_depths) + self.loss_segmentation(output_segmentations, Y_segmentations)
+                # loss = self.loss_depth(output_depths, Y_depths) + self.loss_segmentation(output_segmentations, Y_segmentations)
+                loss = self.loss_depth(output_depths, Y_depths)
                 val_loss += loss.item()
                 pbar.set_postfix({'validation_loss': val_loss/(i+1)})
             if self.config['wandb']['enable']:
