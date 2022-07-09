@@ -57,12 +57,17 @@ class FocusOnDepth(nn.Module):
         # encoder_layer = nn.TransformerEncoderLayer(d_model=emb_dim, nhead=num_heads, dropout=transformer_dropout, dim_feedforward=emb_dim*4)
         # self.transformer_encoders = nn.TransformerEncoder(encoder_layer, num_layers=num_layers_encoder)
         
-        self.class_embeddings = nn.Parameter(torch.randn(1, 1, nclasses, class_embedding_size))
-        self.transformer_encoders = timm.create_model(model_timm, pretrained=True)
-        self.emb_to_vit = nn.Linear(emb_dim + class_embedding_size, emb_dim)
         self.num_classes = nclasses
         self.patch_size = patch_size
         self.type_ = type
+
+        self.class_embeddings = nn.Parameter(torch.randn(1, 1, nclasses, class_embedding_size))
+        self.transformer_encoders = timm.create_model(model_timm, pretrained=True)
+        self.emb_to_vit = nn.Linear(emb_dim + class_embedding_size, emb_dim)
+        self.seg_patch_emb = timm.models.layers.PatchEmbed(img_size=image_size[-1],
+                                                           patch_size=patch_size,
+                                                           in_chans=1,
+                                                           embed_dim=emb_dim)
 
         # Register hooks
         self.activation = {}
@@ -100,7 +105,8 @@ class FocusOnDepth(nn.Module):
         
         return model.forward_head(x)
 
-    def segmentation_distill(self, seg_patches):
+    def segmentation_distill(self, segmentations):
+        seg_patches = self.seg_patch_emb(segmentations.to(torch.int64))
         oh_patches = nn.functional.one_hot(seg_patches, num_classes=self.num_classes)
         class_distribution = oh_patches.sum(dim=-2, keepdim=True) / (self.patch_size**2)
         weighted_embeddings = class_distribution.transpose(-1, -2) * self.class_embeddings
@@ -125,8 +131,7 @@ class FocusOnDepth(nn.Module):
         img_patches = model.patch_embed(images)
         # TO DO: integrate segmentation result of the patch
         # l*768 -> l*1024 
-        seg_patches = model.patch_embed(segmentations.to(torch.int64))
-        patch_embeddings = self.segmentation_distill(seg_patches=seg_patches)
+        patch_embeddings = self.segmentation_distill(segmentations=segmentations)
         patches = torch.cat((img_patches, patch_embeddings), dim=-1)
         # l*1024 -> l*768
         vit_input = self.emb_to_vit(patches)
