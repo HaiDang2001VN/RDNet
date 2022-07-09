@@ -138,7 +138,10 @@ class FocusOnDepth(nn.Module):
         # l*1024 -> l*768
         vit_input = self.emb_to_vit(patches)
         t = self.transformer_forward(model, vit_input)
-        
+        print("vit_input: ", vit_input.isnan().sum())
+        print("t: ", t.isnan().sum())
+
+
         previous_stage = None
         for i in np.arange(len(self.fusions)-1, -1, -1):
             hook_to_take = 't'+str(self.hooks[i])
