@@ -131,15 +131,19 @@ class FocusOnDepth(nn.Module):
         # flatten image into patch then patch into vector
         # img_patches size: b l=h*w/p^2 p^2*c
         img_patches = model.patch_embed(images)
+        print("img_patches: ", img_patches.isnan().sum())
         # TO DO: integrate segmentation result of the patch
         # l*768 -> l*1024 
         patch_embeddings = self.segmentation_distill(segmentations=segmentations)
+        print("patch_embeddings: ", patch_embeddings.isnan().sum())
         patches = torch.cat((img_patches, patch_embeddings), dim=-1)
+        print("patches: ", patches.isnan().sum())
         # l*1024 -> l*768
         vit_input = self.emb_to_vit(patches)
         t = self.transformer_forward(model, vit_input)
         print("vit_input: ", vit_input.isnan().sum())
         print("t: ", t.isnan().sum())
+
 
 
         previous_stage = None
