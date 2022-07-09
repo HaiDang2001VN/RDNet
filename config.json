@@ -1,25 +1,33 @@
 {
-    "General":{
-        "device":"cuda",
-        "type":"full",
-        "model_timm":"vit_base_patch16_384",
-        "emb_dim":768,
-        "hooks":[2, 5, 8, 11],
-        "num_heads":8,
-        "read":"projection",
-        "resample_dim":256,
-        "optim":"adam",
-        "lr_backbone":1e-5,
-        "lr_scratch":3e-4,
-        "loss_depth":"ssi",
-        "loss_segmentation":"ce",
-        "momentum":0.9,
-        "epochs":20,
-        "batch_size":8,
-        "path_model":"models",
-        "path_predicted_images":"output",
-        "seed":42,
-        "patch_size":16
+  "General": {
+    "device": "cuda",
+    "type": "full",
+    "model_timm": "vit_base_patch16_384",
+    "emb_dim": 768,
+    "hooks": [2, 5, 8, 11],
+    "num_heads": 8,
+    "read": "projection",
+    "resample_dim": 256,
+    "optim": "adam",
+    "lr_backbone": 1e-5,
+    "lr_scratch": 3e-4,
+    "loss_depth": "ssi",
+    "loss_segmentation": "ce",
+    "momentum": 0.9,
+    "epochs": 10,
+    "batch_size": 4,
+    "path_model": "models",
+    "path_predicted_images": "output",
+    "seed": 42,
+    "patch_size": 16
+  },
+  "Dataset": {
+    "paths": {
+      "path_dataset": "/kaggle/input",
+      "list_datasets": ["nyuv2-fod/nyuv2"],
+      "path_images": "images",
+      "path_segmentations": "segmentations",
+      "path_depths": "depths"
     },
     "Dataset":{
         "paths":{
@@ -147,5 +155,5 @@
         "im_h":540,
         "im_w":980
     }
-
+  }
 }
