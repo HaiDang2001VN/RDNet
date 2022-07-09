@@ -40,13 +40,17 @@ class AutoFocusDataset(Dataset):
         path_depths = os.path.join(config['Dataset']['paths']['path_dataset'], dataset_name, config['Dataset']['paths']['path_depths'])
         path_segmentations = os.path.join(config['Dataset']['paths']['path_dataset'], dataset_name, config['Dataset']['paths']['path_segmentations'])
 
+        print("Image path: ", path_images)
+        print("Depth path: ", path_depths)
+        print("Segmentation path: ", path_segmentations)
+        
         self.paths_images = get_total_paths(path_images, config['Dataset']['extensions']['ext_images'])
         self.paths_depths = get_total_paths(path_depths, config['Dataset']['extensions']['ext_depths'])
         self.paths_segmentations = get_total_paths(path_segmentations, config['Dataset']['extensions']['ext_segmentations'])
 
         assert (self.split in ['train', 'test', 'val']), "Invalid split!"
-        assert (len(self.paths_images) == len(self.paths_depths)), "Different number of instances between the input and the depth maps"
-        assert (len(self.paths_images) == len(self.paths_segmentations)), "Different number of instances between the input and the segmentation maps"
+        assert (len(self.paths_images) == len(self.paths_depths)), f"Different number of instances between the input and the depth maps, {len(self.paths_images)} and {len(self.paths_depths)}"
+        assert (len(self.paths_images) == len(self.paths_segmentations)), f"Different number of instances between the input and the segmentation maps, {len(self.paths_images)} and {len(self.paths_segmentations)}"
         assert (config['Dataset']['splits']['split_train']+config['Dataset']['splits']['split_test']+config['Dataset']['splits']['split_val'] == 1), "Invalid splits (sum must be equal to 1)"
         # check for segmentation
 
