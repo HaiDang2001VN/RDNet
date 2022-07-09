@@ -65,10 +65,11 @@ class FocusOnDepth(nn.Module):
         self.transformer_encoders = timm.create_model(model_timm, pretrained=True)
         print(emb_dim + class_embedding_size, emb_dim)
         self.emb_to_vit = nn.Linear(emb_dim + class_embedding_size, emb_dim)
-        self.seg_patch_emb = timm.models.layers.PatchEmbed(img_size=image_size[-1],
-                                                           patch_size=patch_size,
-                                                           in_chans=1,
-                                                           embed_dim=emb_dim)
+        self.seg_patch_emb = Rearrange('b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1=patch_size, p2=patch_size)
+        # self.seg_patch_emb = timm.models.layers.PatchEmbed(img_size=image_size[-1],
+        #                                                    patch_size=patch_size,
+        #                                                    in_chans=1,
+        #                                                    embed_dim=emb_dim)
 
         # Register hooks
         self.activation = {}
@@ -126,10 +127,6 @@ class FocusOnDepth(nn.Module):
 
         # Feed pre-processed images to transformer
         # t = self.transformer_encoders(img)
-        
-        print("before: ", segmentations.min(), segmentations.max(), segmentations.unique())
-        segmentations += 1
-        print("after: ", segmentations.min(), segmentations.max(), segmentations.unique())
         
         model = self.transformer_encoders
         # flatten image into patch then patch into vector
