@@ -126,7 +126,8 @@ class FocusOnDepth(nn.Module):
 
         # Feed pre-processed images to transformer
         # t = self.transformer_encoders(img)
-        
+        print("images: ", images.isnan().sum(), images.min().item(), images.max().item())
+
         model = self.transformer_encoders
         # flatten image into patch then patch into vector
         # img_patches size: b l=h*w/p^2 p^2*c
