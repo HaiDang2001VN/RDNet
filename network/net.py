@@ -127,7 +127,9 @@ class FocusOnDepth(nn.Module):
         # Feed pre-processed images to transformer
         # t = self.transformer_encoders(img)
         
+        print("before: ", segmentations.min(), segmentations.max(), segmentations.unique())
         segmentations += 1
+        print("after: ", segmentations.min(), segmentations.max(), segmentations.unique())
         
         model = self.transformer_encoders
         # flatten image into patch then patch into vector
