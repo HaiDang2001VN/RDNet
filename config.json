@@ -2,7 +2,7 @@
   "General": {
     "device": "cuda",
     "type": "full",
-    "model_timm": "vit_base_patch16_384",
+    "model_timm": "vit_base_patch32_384",
     "emb_dim": 768,
     "hooks": [2, 5, 8, 11],
     "num_heads": 8,
@@ -14,12 +14,12 @@
     "loss_depth": "ssi",
     "loss_segmentation": "ce",
     "momentum": 0.9,
-    "epochs": 20,
+    "epochs": 10,
     "batch_size": 1,
     "path_model": "models",
     "path_predicted_images": "output",
     "seed": 42,
-    "patch_size": 16
+    "patch_size": 32
   },
   "Dataset": {
     "paths": {
