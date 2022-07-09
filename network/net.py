@@ -1,3 +1,5 @@
+from statistics import mode
+from unittest.mock import patch
 import numpy as np
 import torch
 import torch.nn as nn
@@ -25,7 +27,8 @@ class FocusOnDepth(nn.Module):
                  transformer_dropout= 0,
                  nclasses           = 2,
                  type               = "full",
-                 model_timm         = "vit_large_patch16_384"):
+                 model_timm         = "vit_large_patch16_384",
+                 class_embedding_size = 256):
         """
         Focus on Depth
         type : {"full", "depth", "segmentation"}
@@ -54,7 +57,11 @@ class FocusOnDepth(nn.Module):
         # encoder_layer = nn.TransformerEncoderLayer(d_model=emb_dim, nhead=num_heads, dropout=transformer_dropout, dim_feedforward=emb_dim*4)
         # self.transformer_encoders = nn.TransformerEncoder(encoder_layer, num_layers=num_layers_encoder)
         
+        self.class_embeddings = nn.Parameter(torch.randn(1, 1, nclasses, class_embedding_size))
         self.transformer_encoders = timm.create_model(model_timm, pretrained=True)
+        self.emb_to_vit = nn.Linear(emb_dim + class_embedding_size, emb_dim)
+        self.num_classes = nclasses
+        self.patch_size = patch_size
         self.type_ = type
 
         # Register hooks
@@ -92,8 +99,15 @@ class FocusOnDepth(nn.Module):
         x = model.norm(x)
         
         return model.forward_head(x)
+
+    def segmentation_distill(self, seg_patches):
+        oh_patches = nn.functional.one_hot(seg_patches, num_classes=self.num_classes)
+        class_distribution = oh_patches.sum(dim=-2, keepdim=True) / (self.patch_size**2)
+        weighted_embeddings = class_distribution.transpose(-1, -2) * self.class_embeddings
+        patch_embeddings = weighted_embeddings.sum(dim=-2)
+        return patch_embeddings
     
-    def forward(self, img):
+    def forward(self, images, segmentations):
         # Pre-processing images
         # x = self.to_patch_embedding(img)
         # b, n, _ = x.shape
@@ -106,8 +120,17 @@ class FocusOnDepth(nn.Module):
         # t = self.transformer_encoders(img)
         
         model = self.transformer_encoders
-        x = model.patch_embed(img)
-        t = self.transformer_forward(model, x)
+        # flatten image into patch then patch into vector
+        # img_patches size: b l=h*w/p^2 p^2*c
+        img_patches = model.patch_embed(images)
+        # TO DO: integrate segmentation result of the patch
+        # l*768 -> l*1024 
+        seg_patches = model.patch_embed(segmentations.to(torch.int64))
+        patch_embeddings = self.segmentation_distill(seg_patches=seg_patches)
+        patches = torch.cat((img_patches, patch_embeddings), dim=-1)
+        # l*1024 -> l*768
+        vit_input = self.emb_to_vit(patches)
+        t = self.transformer_forward(model, vit_input)
         
         previous_stage = None
         for i in np.arange(len(self.fusions)-1, -1, -1):
