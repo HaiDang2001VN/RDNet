@@ -8,9 +8,9 @@ from scipy.ndimage.filters import gaussian_filter
 
 from PIL import Image
 
-from FOD.FocusOnDepth import FocusOnDepth
-from FOD.utils import create_dir
-from FOD.dataset import show
+from network.net import FocusOnDepth
+from util.utils import create_dir
+from util.dataset import show
 
 
 class Predictor(object):

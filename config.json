@@ -24,7 +24,7 @@
     "Dataset":{
         "paths":{
             "path_dataset":"/kaggle/input",
-            "list_datasets":["inria-fod", "nyuv2-fod/nyuv2", "posetrack-fod"],
+            "list_datasets":["nyuv2-fod/nyuv2"],
             "path_images":"images",
             "path_segmentations":"segmentations",
             "path_depths":"depths"
