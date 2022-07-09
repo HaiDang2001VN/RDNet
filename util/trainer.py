@@ -10,7 +10,7 @@ from tqdm import tqdm
 from os import replace
 from numpy.core.numeric import Inf
 from util.utils import get_losses, get_optimizer, get_schedulers, create_dir
-from network.model import FocusOnDepth
+from network.net import FocusOnDepth
 
 class Trainer(object):
     def __init__(self, config):
