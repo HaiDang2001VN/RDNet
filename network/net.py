@@ -25,7 +25,7 @@ class FocusOnDepth(nn.Module):
                  hooks              = [5, 11, 17, 23],
                  reassemble_s       = [4, 8, 16, 32],
                  transformer_dropout= 0,
-                 nclasses           = 2,
+                 nclasses           = 3,
                  type               = "full",
                  model_timm         = "vit_large_patch16_384",
                  class_embedding_size = 256):
@@ -126,6 +126,8 @@ class FocusOnDepth(nn.Module):
 
         # Feed pre-processed images to transformer
         # t = self.transformer_encoders(img)
+        
+        segmentations += 1
         
         model = self.transformer_encoders
         # flatten image into patch then patch into vector
