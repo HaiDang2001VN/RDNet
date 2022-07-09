@@ -81,9 +81,10 @@ class Trainer(object):
 
                 running_loss += loss.item()
                 if np.isnan(running_loss):
-                    print('\n',
+                    print("About to exit: \n",
                         X.min().item(), X.max().item(),'\n',
                         Y_depths.min().item(), Y_depths.max().item(),'\n',
+                        Y_segmentations.min().item(), Y_segmentations.max().item(), '\n', 
                         output_depths.min().item(), output_depths.max().item(),'\n',
                         loss.item(),
                     )
