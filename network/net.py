@@ -136,7 +136,6 @@ class FocusOnDepth(nn.Module):
             reassemble_result = self.reassembles[i](activation_result)
             fusion_result = self.fusions[i](reassemble_result, previous_stage)
             previous_stage = fusion_result
-        print("prev: ", previous_stage.isnan().sum())
         
         out_depth = None
         out_segmentation = None
