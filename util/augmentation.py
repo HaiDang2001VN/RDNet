@@ -19,7 +19,7 @@ class ToMask(object):
         # avoid taking the alpha channel
         image_array = np.array(pil_image)[:, :, :3]
         # get only one channel for the output
-        output_shape = image_array.shape
+        output_shape = list(image_array.shape)
         output_shape[-1] = 1
         output_array = np.zeros(output_shape, dtype="int")
 
