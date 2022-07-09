@@ -28,11 +28,11 @@ class HeadDepth(nn.Module):
             nn.ReLU(),
             nn.Conv2d(32, 1, kernel_size=1, stride=1, padding=0),
             # nn.ReLU()
-            nn.Sigmoid()
+            # nn.Sigmoid()
         )
     def forward(self, x):
         x = self.head(x)
-        # x = (x - x.min())/(x.max()-x.min() + 1e-15)
+        x = (x - x.min())/(x.max()-x.min() + 1e-15)
         return x
 
 class HeadSeg(nn.Module):
