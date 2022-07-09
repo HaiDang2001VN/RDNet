@@ -24,5 +24,5 @@ class ToMask(object):
             output_array[mask[:, :, 0]] = int(label)
 
         output_array = torch.from_numpy(output_array).unsqueeze(0).long()
-        print(output_array.min(), output_array.max(), output_array.unique())
+        print("Prepare: ", output_array.min(), output_array.max(), output_array.unique())
         return output_array
