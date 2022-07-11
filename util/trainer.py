@@ -17,6 +17,7 @@ class Trainer(object):
         super().__init__()
         self.config = config
         self.type = self.config['General']['type']
+        self.loss_ratio = self.config['General']['loss_ratio']
 
         self.device = torch.device(self.config['General']['device'] if torch.cuda.is_available() else "cpu")
         print("device: %s" % self.device)
@@ -71,7 +72,7 @@ class Trainer(object):
                 Y_depths = Y_depths.squeeze(1) #1xHxW -> HxW
                 Y_segmentations = Y_segmentations.squeeze(1) #1xHxW -> HxW
                 # get loss
-                loss = self.loss_depth(output_depths, Y_depths) + self.loss_segmentation(output_segmentations, Y_segmentations)
+                loss = self.loss_depth(output_depths, Y_depths) + self.loss_ratio * self.loss_segmentation(output_segmentations, Y_segmentations)
                 # loss = self.loss_depth(output_depths, Y_depths)
                 loss.backward()
                 # step optimizer
@@ -135,7 +136,7 @@ class Trainer(object):
                     output_depths_1 = output_depths
                     output_segmentations_1 = output_segmentations
                 # get loss
-                loss = self.loss_depth(output_depths, Y_depths) + self.loss_segmentation(output_segmentations, Y_segmentations)
+                loss = self.loss_depth(output_depths, Y_depths) + self.loss_ratio * self.loss_segmentation(output_segmentations, Y_segmentations)
                 # loss = self.loss_depth(output_depths, Y_depths)
                 val_loss += loss.item()
                 pbar.set_postfix({'validation_loss': val_loss/(i+1)})
